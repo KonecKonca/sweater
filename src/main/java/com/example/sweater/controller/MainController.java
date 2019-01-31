@@ -69,7 +69,12 @@ public class MainController {
             model.addAttribute("message", message);
         } else {
             if (file != null && !file.getOriginalFilename().isEmpty()) {
-                File uploadDir = new File(uploadPath);
+
+                String filePath = System.getProperty("catalina.home") + File.separator + "webapps" +
+                        File.separator + "expanded" + uploadPath;
+                File uploadDir = new File(filePath);
+
+                //                File uploadDir = new File(uploadPath);
 
                 if (!uploadDir.exists()) {
                     uploadDir.mkdir();
@@ -78,7 +83,8 @@ public class MainController {
                 String uuidFile = UUID.randomUUID().toString();
                 String resultFilename = uuidFile + "." + file.getOriginalFilename();
 
-                file.transferTo(new File(uploadPath + "/" + resultFilename));
+//                file.transferTo(new File(uploadPath + File.separator + resultFilename));
+                file.transferTo(new File(filePath + File.separator + resultFilename));
 
                 message.setFilename(resultFilename);
             }
