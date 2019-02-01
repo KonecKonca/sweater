@@ -66,8 +66,8 @@ public class MessageController {
             @AuthenticationPrincipal User user,
             @Valid Message message,
             BindingResult bindingResult,
-            Model model,
-            @RequestParam("file") MultipartFile file
+            Model model/*,
+            @RequestParam("file") MultipartFile file*/
     ) throws IOException {
         message.setAuthor(user);
 
@@ -77,7 +77,7 @@ public class MessageController {
             model.mergeAttributes(errorsMap);
             model.addAttribute("message", message);
         } else {
-            saveFile(message, file);
+//            saveFile(message, file);
 
             model.addAttribute("message", null);
 
@@ -88,7 +88,7 @@ public class MessageController {
 
         model.addAttribute("messages", messages);
 
-        return "main";
+        return "redirect:/main";
     }
 
     private void saveFile(@Valid Message message, @RequestParam("file") MultipartFile file) throws IOException {
@@ -136,24 +136,30 @@ public class MessageController {
             @PathVariable Long user,
             @RequestParam("id") Message message,
             @RequestParam("text") String text,
-            @RequestParam("tag") String tag,
-            @RequestParam("file") MultipartFile file
+            @RequestParam("tag") String tag/*,
+            @RequestParam("file") MultipartFile file*/
     ) throws IOException {
-        if (message.getAuthor().equals(currentUser)) {
-            if (!StringUtils.isEmpty(text)) {
-                message.setText(text);
+
+        try{
+            if (message.getAuthor().equals(currentUser)) {
+                if (!StringUtils.isEmpty(text)) {
+                    message.setText(text);
+                }
+
+                if (!StringUtils.isEmpty(tag)) {
+                    message.setTag(tag);
+                }
+
+//            saveFile(message, file);
+
+                messageRepo.save(message);
             }
 
-            if (!StringUtils.isEmpty(tag)) {
-                message.setTag(tag);
-            }
-
-            saveFile(message, file);
-
-            messageRepo.save(message);
+        }
+        finally {
+            return "redirect:/user-messages/" + user;
         }
 
-        return "redirect:/user-messages/" + user;
     }
 
     @GetMapping("/messages/{message}/like")

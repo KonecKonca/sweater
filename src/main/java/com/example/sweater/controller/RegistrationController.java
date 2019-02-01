@@ -37,20 +37,22 @@ public class RegistrationController {
         return "registration";
     }
 
+
+    // Comments diu to disable captcha
     @PostMapping("/registration")
     public String addUser(
             @RequestParam("password2") String passwordConfirm,
-            @RequestParam("g-recaptcha-response") String captchaResponce,
+//            @RequestParam("g-recaptcha-response") String captchaResponce,
             @Valid User user,
             BindingResult bindingResult,
             Model model
     ) {
-        String url = String.format(CAPTCHA_URL, secret, captchaResponce);
-        CaptchaResponseDto response = restTemplate.postForObject(url, Collections.emptyList(), CaptchaResponseDto.class);
-
-        if (!response.isSuccess()) {
-            model.addAttribute("captchaError", "Fill captcha");
-        }
+//        String url = String.format(CAPTCHA_URL, secret, captchaResponce);
+//        CaptchaResponseDto response = restTemplate.postForObject(url, Collections.emptyList(), CaptchaResponseDto.class);
+//
+//        if (!response.isSuccess()) {
+//            model.addAttribute("captchaError", "Fill captcha");
+//        }
 
         boolean isConfirmEmpty = StringUtils.isEmpty(passwordConfirm);
 
@@ -62,7 +64,7 @@ public class RegistrationController {
             model.addAttribute("passwordError", "Passwords are different!");
         }
 
-        if (isConfirmEmpty || bindingResult.hasErrors() || !response.isSuccess()) {
+        if (isConfirmEmpty || bindingResult.hasErrors() /*|| !response.isSuccess()*/) {
             Map<String, String> errors = ControllerUtils.getErrors(bindingResult);
 
             model.mergeAttributes(errors);
@@ -74,6 +76,8 @@ public class RegistrationController {
             model.addAttribute("usernameError", "User exists!");
             return "registration";
         }
+
+        model.addAttribute("user", user);
 
         return "redirect:/login";
     }
@@ -92,4 +96,5 @@ public class RegistrationController {
 
         return "login";
     }
+
 }
